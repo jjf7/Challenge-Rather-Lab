@@ -10,7 +10,7 @@ contract Leaderboard {
 
     bytes4 private constant FUNC_SELECTOR = bytes4(keccak256("getLifetimeScore(address)"));
     
-    uint public max_players = 4;
+    uint public max_players = 10;
     uint public count;
 
     address public admin;
