@@ -10,13 +10,13 @@ contract Leaderboard {
 
     bytes4 private constant FUNC_SELECTOR = bytes4(keccak256("getLifetimeScore(address)"));
     
-    uint public max_players = 10;
+    uint public maxPlayers = 10;
     uint public count;
 
     address public admin;
 
     struct Player{
-        address _address;
+        address player;
         uint points;
     }
 
@@ -59,7 +59,7 @@ contract Leaderboard {
     function addPlayerToBoard(uint leaderboardId) external {
         require(leaderboardId >= 1 && leaderboardId <= count, 'Invalid leaderboardId');
         require(block.timestamp < boards[leaderboardId].timestampBegin, 'This Board have begun, search for another board.');
-        require(playersCountByBoard[leaderboardId] < max_players, 'Number of players exccees by board');
+        require(playersCountByBoard[leaderboardId] < maxPlayers, 'Number of players exccees by board');
         require(playerInBoard[leaderboardId][msg.sender] == false, 'the player is already registered');
 
         boards[leaderboardId].players.push(Player(msg.sender, 0));
@@ -86,10 +86,10 @@ contract Leaderboard {
        
         for(uint i = 0; i < countPlayers; i++){
                 // consultar los puntos de cada jugador 
-                newArray[i].points = _getLifetimeScore(leaderboardId, newArray[i]._address);
+                newArray[i].points = _getLifetimeScore(leaderboardId, newArray[i].player);
         }
         
-        Player[] memory arreglo = sort_array(newArray);
+        Player[] memory arreglo = sortArray(newArray);
 
         for(uint i = 0; i < countPlayers; i++){
             newArray[i] = arreglo[i];
@@ -111,7 +111,7 @@ contract Leaderboard {
         uint l = boards[leaderboardId].players.length; 
         uint reward = 0;
         for(uint i = 0 ; i< l; i++ ){
-            if(boards[leaderboardId].players[i]._address == msg.sender){
+            if(boards[leaderboardId].players[i].player == msg.sender){
                 reward = boards[leaderboardId].players[i].points * (l-(i+1));
             }
         }
@@ -119,13 +119,13 @@ contract Leaderboard {
         return reward;
     }
 
-    function sort_array(Player[] memory arr_) public pure returns (Player[] memory){
-        uint256 l = arr_.length;
+    function sortArray(Player[] memory _arr) public pure returns (Player[] memory){
+        uint256 l = _arr.length;
         Player[] memory arr = new Player[] (l);
 
         for(uint i=0;i<l;i++)
         {
-            arr[i] = arr_[i];
+            arr[i] = _arr[i];
         }
 
         for(uint i =0;i<l;i++)
@@ -149,8 +149,8 @@ contract Leaderboard {
         admin = _admin;
     }
 
-    function updateMaxPlayers(uint _max_players) public onlyAdmin{
-        max_players = _max_players;
+    function updateMaxPlayers(uint _maxPlayers) public onlyAdmin{
+        maxPlayers = _maxPlayers;
     }
 
     // Validate smart contract function included
